@@ -48,12 +48,31 @@ void insert(tst **tree, int val) {
         return;
     }
 
-    if (val < (*tree)->data) {
+    if (val < (*tree)->data) { //left node
         insert(&(*tree)->left, val);
-    } else if (val > (*tree)->data && val < pow((*tree)->data, 2)) {
+    } else if (val > (*tree)->data && val < pow((*tree)->data, 2)) { //middle node
         insert(&(*tree)->middle, val);
-    } else {
+    } else if (val > pow((*tree)->data, 2)) { // right node
         insert(&(*tree)->right, val);
     }
 
+}
+
+tst *search(tst **tree, int val) {
+    if (!(*tree)) {
+        return NULL;
+    }
+    if (val < (*tree)->data) // left node
+    {
+        search(&((*tree)->left), val);
+    }
+    else if (val > (*tree)->data && val < pow((*tree)->data, 2)) { // middle node
+        search(&((*tree)->middle), val);
+    }
+    else if (val > pow((*tree)->data, 2)) { // right node
+        search(&((*tree)->right), val);
+    }
+    else if (val == (*tree)->data) {
+        return *tree; // return search node
+    }
 }
