@@ -13,13 +13,16 @@ void read(char file[]);
 
 void insert(tst **tree, int val);
 
+tst *findMax(tst *tree);
+
+
 
 //GLOBAL VARİABLES
 
 
 int main() {
-    printf("Hello, World!\n");
-    return 0;
+
+//    read("input.txt");
 }
 
 void read(char file[]) { //function that read file content
@@ -33,6 +36,7 @@ void read(char file[]) { //function that read file content
     char str[20];
     while (!feof(fp)) { //read file
         fscanf(fp, "%s", str);
+        printf("%s",str);
         //    insert(&hdr, str, docId, lenght, category); // insertion word to master linked list
     }
     fclose(fp);
@@ -62,17 +66,25 @@ tst *search(tst **tree, int val) {
     if (!(*tree)) {
         return NULL;
     }
+
     if (val < (*tree)->data) // left node
     {
         search(&((*tree)->left), val);
-    }
-    else if (val > (*tree)->data && val < pow((*tree)->data, 2)) { // middle node
+    } else if (val > (*tree)->data && val < pow((*tree)->data, 2)) { // middle node
         search(&((*tree)->middle), val);
-    }
-    else if (val > pow((*tree)->data, 2)) { // right node
+    } else if (val > pow((*tree)->data, 2)) { // right node
         search(&((*tree)->right), val);
-    }
-    else if (val == (*tree)->data) {
+    } else if (val == (*tree)->data) {
         return *tree; // return search node
     }
+}
+tst *findMax(tst *tree){
+    if(tree==NULL) return NULL;
+    if(tree->right==NULL) // right ve middle null ise kendini döndür
+        if (tree->middle==NULL) return tree;
+
+    if(tree->right==NULL) //right null ve middle null değilse middle ı recursive fonsiyona gönder
+        if (tree->middle!=NULL) return findMax(tree->middle);
+
+    return findMax(tree->right);   //son case right a git
 }
