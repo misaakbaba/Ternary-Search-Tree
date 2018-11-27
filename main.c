@@ -1,5 +1,5 @@
-#include<stdlib.h>
-#include<stdio.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 struct tst_tree {
@@ -13,16 +13,21 @@ void read(char file[]);
 
 void insert(tst **tree, int val);
 
+tst *search(tst **tree, int val);
+
 tst *findMax(tst *tree);
 
 
 
 //GLOBAL VARİABLES
-
+tst *root;
 
 int main() {
 
-//    read("input.txt");
+    read("input.txt.txt");
+   tst *temp=findMax(root);
+
+   printf("%d",temp->data);
 }
 
 void read(char file[]) { //function that read file content
@@ -33,11 +38,12 @@ void read(char file[]) { //function that read file content
         puts("Cannot open file");
         return;
     }
-    char str[20];
+    int num;
     while (!feof(fp)) { //read file
-        fscanf(fp, "%s", str);
-        printf("%s",str);
-        //    insert(&hdr, str, docId, lenght, category); // insertion word to master linked list
+        fscanf(fp, "%d", &num);
+//        printf("%d\t",num);
+
+        insert(&root,num);
     }
     fclose(fp);
 }
@@ -54,9 +60,9 @@ void insert(tst **tree, int val) {
 
     if (val < (*tree)->data) { //left node
         insert(&(*tree)->left, val);
-    } else if (val > (*tree)->data && val < pow((*tree)->data, 2)) { //middle node
+    } else if (val > (*tree)->data && val < ((*tree)->data * (*tree)->data)) { //middle node
         insert(&(*tree)->middle, val);
-    } else if (val > pow((*tree)->data, 2)) { // right node
+    } else if (val > ((*tree)->data * (*tree)->data)) { // right node
         insert(&(*tree)->right, val);
     }
 
@@ -70,9 +76,9 @@ tst *search(tst **tree, int val) {
     if (val < (*tree)->data) // left node
     {
         search(&((*tree)->left), val);
-    } else if (val > (*tree)->data && val < pow((*tree)->data, 2)) { // middle node
+    } else if (val > (*tree)->data && val < ((*tree)->data * (*tree)->data)) { // middle node
         search(&((*tree)->middle), val);
-    } else if (val > pow((*tree)->data, 2)) { // right node
+    } else if (val > ((*tree)->data * (*tree)->data)) { // right node
         search(&((*tree)->right), val);
     } else if (val == (*tree)->data) {
         return *tree; // return search node
