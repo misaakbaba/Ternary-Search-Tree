@@ -17,6 +17,7 @@ tst *search(tst **tree, int val);
 
 tst *findMax(tst *tree);
 
+tst *deleteNode(tst *root, int key);
 
 
 //GLOBAL VARİABLES
@@ -25,9 +26,8 @@ tst *root;
 int main() {
 
     read("input.txt.txt");
-   tst *temp=findMax(root);
+    root=deleteNode(root,80);
 
-   printf("%d",temp->data);
 }
 
 void read(char file[]) { //function that read file content
@@ -43,7 +43,7 @@ void read(char file[]) { //function that read file content
         fscanf(fp, "%d", &num);
 //        printf("%d\t",num);
 
-        insert(&root,num);
+        insert(&root, num);
     }
     fclose(fp);
 }
@@ -84,13 +84,64 @@ tst *search(tst **tree, int val) {
         return *tree; // return search node
     }
 }
-tst *findMax(tst *tree){
-    if(tree==NULL) return NULL;
-    if(tree->right==NULL) // right ve middle null ise kendini döndür
-        if (tree->middle==NULL) return tree;
 
-    if(tree->right==NULL) //right null ve middle null değilse middle ı recursive fonsiyona gönder
-        if (tree->middle!=NULL) return findMax(tree->middle);
+tst *findMax(tst *tree) {
+    if (tree == NULL) return NULL;
+    if (tree->right == NULL) // right ve middle null ise kendini döndür
+        if (tree->middle == NULL) return tree;
+
+    if (tree->right == NULL) //right null ve middle null değilse middle ı recursive fonsiyona gönder
+        if (tree->middle != NULL) return findMax(tree->middle);
 
     return findMax(tree->right);   //son case right a git
+}
+
+tst *findMin(tst *tree) {
+    tst *current = tree;
+
+    while (current->left != NULL)
+        current = current->left;
+
+    return current;
+}
+
+tst *deleteNode(tst *root, int key) {
+/*
+ * 1   burada silinecek node un yerini bul if else ile
+ * 2
+*/
+    //base case
+    if (root == NULL) return root;
+
+    //left side case
+    if (key<root->data)
+        root->left=deleteNode(root->left,key);
+
+    //middle side case
+    else if (key > root->data && (key < (root->data * root->data)))
+        root->middle=deleteNode(root->middle,key);
+
+    //right side case
+    else if (key > (root->data * root->data))
+        root->right=deleteNode(root->right,key);
+
+    //if the same root's key
+    else {
+        if (root->left == NULL){
+            tst *temp=root->right;
+            free(root);
+            return temp;
+        }
+        else if (root->right==NULL){
+            tst *temp=root->left;
+            free(root);
+            return temp;
+        }
+        /*
+         * buraya da aradan ayıklama işlemi yazılacak
+         */
+
+
+    }
+    return root;
 }
