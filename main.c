@@ -17,7 +17,14 @@ tst *search(tst **tree, int val);
 
 tst *findMax(tst *tree);
 
+tst *findMin(tst *tree);
+
 tst *deleteNode(tst *root, int key);
+
+void rebuild(tst *tree);
+
+void traversal(tst *tree);
+
 
 
 //GLOBAL VARİABLES
@@ -26,7 +33,10 @@ tst *root;
 int main() {
 
     read("input.txt.txt");
-    root=deleteNode(root,80);
+    root = deleteNode(root, 40);
+    rebuild(root->right->right);
+    traversal(root->right);
+//    printf("%d",root->right->middle->data);
 
 }
 
@@ -42,7 +52,6 @@ void read(char file[]) { //function that read file content
     while (!feof(fp)) { //read file
         fscanf(fp, "%d", &num);
 //        printf("%d\t",num);
-
         insert(&root, num);
     }
     fclose(fp);
@@ -112,36 +121,72 @@ tst *deleteNode(tst *root, int key) {
 */
     //base case
     if (root == NULL) return root;
-
+    tst *temp;
     //left side case
-    if (key<root->data)
-        root->left=deleteNode(root->left,key);
+    if (key < root->data)
+        root->left = deleteNode(root->left, key);
 
-    //middle side case
+        //middle side case
     else if (key > root->data && (key < (root->data * root->data)))
-        root->middle=deleteNode(root->middle,key);
+        root->middle = deleteNode(root->middle, key);
 
-    //right side case
+        //right side case
     else if (key > (root->data * root->data))
-        root->right=deleteNode(root->right,key);
+        root->right = deleteNode(root->right, key);
 
-    //if the same root's key
+        //if the same root's key
     else {
-        if (root->left == NULL){
-            tst *temp=root->right;
-            free(root);
-            return temp;
+        if (root->left && root->middle) {
+            temp = findMin(root->middle);
+            root->data = temp->data;
+            root->middle = deleteNode(root->middle, root->data);
+        } else {
+            temp = root;
+            if (root->left == NULL)
+                root = root->right;
+            else if (root->right == NULL)
+                root = root->left;
+            free(temp);
         }
-        else if (root->right==NULL){
-            tst *temp=root->left;
-            free(root);
-            return temp;
-        }
-        /*
-         * buraya da aradan ayıklama işlemi yazılacak
-         */
-
 
     }
     return root;
+
 }
+//        if (root->left == NULL){
+//            tst *temp=root->right;
+//            free(root);
+//            return temp;
+//        }
+//        else if (root->right==NULL){
+//            tst *temp=root->left;
+//            free(root);
+//            return temp;
+//        }
+/*
+ * buraya da aradan ayıklama işlemi yazılacak
+ */
+
+void rebuild(tst *tree) {
+//    tst *temp = baseRoot;
+
+    if (tree == NULL) return;
+    rebuild(tree->left);
+    rebuild(tree->middle);
+    rebuild(tree->right);
+
+//    printf("%d--",tree->data);
+    int data = tree->data;
+    deleteNode(tree, data);
+    insert(&root, data);
+
+}
+void traversal(tst *tree){
+    if (tree == NULL) return;
+    traversal(tree->left);
+    traversal(tree->middle);
+    traversal(tree->right);
+
+    printf("%d--",tree->data);
+}
+
