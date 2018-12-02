@@ -19,12 +19,11 @@ tst *findMax(tst *tree);
 
 tst *findMin(tst *tree);
 
-tst *deleteNode(tst *root, int key);
+tst *deleteNode(tst *tree, int key);
 
 tst *deleteNode2(tst **tree, int key);
 
-
-void rebuild(tst *tree);
+void rebuild(tst *tree, tst *base);
 
 void traversal(tst *tree);
 
@@ -35,16 +34,31 @@ tst *root;
 int main() {
 
     read("input.txt.txt");
+//    traversal(root->left);
+//    puts("");
+//    deleteNode(root, 2);
+//    traversal(root->left);
+//    puts("");
+//
+//    deleteNode(root, 1);
+//    traversal(root->left);
+//    puts("");
+//
     traversal(root->right);
     puts("");
     deleteNode(root, 40);
-//    root = deleteNode(root, 2000);
-//    root = deleteNode(root, 1700);
-    rebuild(root->right->right);
-    root->right->right = NULL;
-    traversal(root->right);
-//    printf("%d",root->right->middle->data);
+//    traversal(root->left);
 
+    rebuild(root->right, root->right);
+    traversal(root->right);
+//    root = deleteNode(root, 2000);
+
+
+//    root = deleteNode(root, 1700);
+//    root->right->right = NULL;
+//    traversal(root->right);
+//    printf("%d",root->right->middle->data);
+//    traversal(root->right);
 }
 
 void read(char file[]) { //function that read file content
@@ -121,93 +135,60 @@ tst *findMin(tst *tree) {
     return current;
 }
 
-tst *deleteNode(tst *root, int key) {
+tst *deleteNode(tst *tree, int key) {
 /*
  * 1   burada silinecek node un yerini bul if else ile
  * 2
 */
     //base case
-    if (root == NULL) return root;
+    if (tree == NULL) return tree;
     tst *temp;
     //left side case
-    if (key < root->data)
-        root->left = deleteNode(root->left, key);
+    if (key < tree->data)
+        tree->left = deleteNode(tree->left, key);
 
         //middle side case
-    else if (key > root->data && (key < (root->data * root->data)))
-        root->middle = deleteNode(root->middle, key);
+    else if (key > tree->data && (key < (tree->data * tree->data)))
+        tree->middle = deleteNode(tree->middle, key);
 
         //right side case
-    else if (key > (root->data * root->data))
-        root->right = deleteNode(root->right, key);
+    else if (key > (tree->data * tree->data))
+        tree->right = deleteNode(tree->right, key);
 
-        //if the same root's key
+        //if the same tree's key
     else {
-        if (root->left && root->middle) {
-            temp = findMin(root->middle);
-            root->data = temp->data;
-            root->middle = deleteNode(root->middle, root->data);
+        if (tree->left && tree->middle) {
+            temp = findMin(tree->middle);
+            tree->data = temp->data;
+            tree->middle = deleteNode(tree->middle, tree->data);
         } else {
-            temp = root;
-            if (root->left != NULL)
-                root = root->left;
-            else if (root->right != NULL)
-                root = root->right;
-            else if (root->middle != NULL)
-                root = root->middle;
-            else if (root->middle == NULL && root->left == NULL && root->right == NULL)
-                root = NULL;
+            /* temp=tree;
+             if (tree->left == NULL) tree=tree->right;
+             else if (tree->right == NULL) tree=tree->left;
+             tree=NULL;
+             free(temp);*/
+            temp = tree;
+            if (tree->left != NULL)
+                tree = tree->left;
+            else if (tree->right != NULL)
+                tree = tree->right;
+            else if (tree->middle != NULL)
+                tree = tree->middle;
+            else if (tree->middle == NULL && tree->left == NULL && tree->right == NULL)
+                tree = NULL;
             free(temp);
         }
-
     }
-    return root;
+    /* if (tree->right != NULL)
+         if (((tree)->data * (tree)->data) > tree->right->data) {
+             int val = tree->right->data;
+             root = deleteNode(tree->right, tree->right->data);
+             insert(&root, val);
+         }*/
+    return tree;
 
 }
 
-tst *deleteNode2(tst **tree, int key) {
-/*
- * 1   burada silinecek node un yerini bul if else ile
- * 2
-*/
-    //base case
-    if ((*tree) == NULL) return (*tree);
-    tst *temp;
-    //left side case
-    if (key < (*tree)->data)
-        (*tree)->left = deleteNode2((*tree)->left, key);
-
-        //middle side case
-    else if (key > (*tree)->data && (key < ((*tree)->data * (*tree)->data)))
-        (*tree)->middle = deleteNode2((*tree)->middle, key);
-
-        //right side case
-    else if (key > ((*tree)->data * (*tree)->data))
-        (*tree)->right = deleteNode2((*tree)->right, key);
-
-        //if the same (*tree)'s key
-    else {
-        if ((*tree)->left && (*tree)->middle) {
-            temp = findMin((*tree)->middle);
-            (*tree)->data = temp->data;
-            (*tree)->middle = deleteNode2((*tree)->middle, (*tree)->data);
-        } else {
-            temp = (*tree);
-            if ((*tree)->left != NULL)
-                (*tree) = (*tree)->left;
-            else if ((*tree)->right != NULL)
-                (*tree) = (*tree)->right;
-            else if ((*tree)->middle != NULL)
-                (*tree) = (*tree)->middle;
-            else if ((*tree)->middle == NULL && (*tree)->left == NULL && (*tree)->right == NULL)
-                (*tree) = NULL;
-            free(temp);
-        }
-
-    }
-    return (*tree);
-
-}
 //        if (root->left == NULL){
 //            tst *temp=root->right;
 //            free(root);
@@ -222,23 +203,30 @@ tst *deleteNode2(tst **tree, int key) {
  * buraya da aradan ayıklama işlemi yazılacak
  */
 
-void rebuild(tst *tree) {
+void rebuild(tst *tree, tst *base) {
 //    tst *temp = baseRoot;
+    //base case
+    int data = findMax(base)->data;
+    if (tree->right == NULL || (base->data) * ((base->data)) < data) {
+        tree->right = NULL;
+        return;
+    }
 
-    if (tree == NULL) return;
-    rebuild(tree->left);
-    rebuild(tree->middle);
-    rebuild(tree->right);
-
-//    printf("tree data is:%d--",tree->data);
-    int data = tree->data;
-//    tree=NULL;
-//    tree->data=-1;
-    deleteNode(tree, data);
-//    tst *temp=search(&tree,data);
-//    temp = NULL;
-//    free(temp);
+    deleteNode(base->right, data);
     insert(&root, data);
+    if (tree->right->left == NULL && tree->right->middle == NULL && tree->right->right == NULL) {
+        data = findMax(base)->data;
+        deleteNode(base->right, data);
+        insert(&root, data);
+        tree->right = NULL;
+        return;
+    }
+    rebuild(tree, base);
+
+
+
+
+//    deleteNode(base,tree->data);
 
 }
 
@@ -247,7 +235,6 @@ void traversal(tst *tree) {
     traversal(tree->left);
     traversal(tree->middle);
     traversal(tree->right);
-
 
     printf("%d--", tree->data);
 }
